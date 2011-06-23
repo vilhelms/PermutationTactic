@@ -1,0 +1,5 @@
+A tactic for solving goals involving Permutation. 
+Useful for working Andrew Appel's Coq exercises.
+
+This is a slightly elaborated version of the monoid
+simplifier described at http://adam.chlipala.net/cpdt/html/Reflection.html.
