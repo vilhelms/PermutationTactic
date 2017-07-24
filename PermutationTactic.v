@@ -82,11 +82,11 @@ Module MonoidReflection (M : COMMUTATIVE_MONOID).
         | (m,y) :: vars1 => 
           match gt_dec m n with
             | left _  => 
-                 match NF_insert m y vars1 with exist rest IH =>
+                 match NF_insert m y vars1 with exist _ rest IH =>
                    exist _ ((n,x) :: rest) _
                  end
             | right _ => 
-                match NF_insert n x vars1 with exist rest IH =>
+                match NF_insert n x vars1 with exist _ rest IH =>
                   exist _ ((m,y) :: rest) _
                 end
           end
@@ -111,9 +111,9 @@ Module MonoidReflection (M : COMMUTATIVE_MONOID).
         | Id => exist _ vars _
         | Op e1 e2 => 
           match normalize_helper e1 vars with 
-            exist vars1 H1 =>
+            exist _ vars1 H1 =>
               match normalize_helper e2 vars1 with
-                exist vars2 H2 =>
+                exist _ vars2 H2 =>
                   exist _ vars2 _
               end
           end
@@ -131,7 +131,7 @@ Module MonoidReflection (M : COMMUTATIVE_MONOID).
     { vars' | NF_denote vars' ~ denote e }.
   refine (
     fun e => match normalize_helper e [] with
-               | exist vars H => exist _ vars _
+               | exist _ vars H => exist _ vars _
              end).
   Proof.
     simpl in H. rewrite id_right in H. exact H.
@@ -180,11 +180,11 @@ Export PermutationAppendMonoidReflect.
    Returns (v, atoms') where v is the variable and atoms' the new list. *)
 Ltac lookup_atom n a atoms :=
   match atoms with
-  |  (Var ?m a) :: _ => constr:(Var m a, atoms)
+  |  (Var ?m a) :: _ => constr:((Var m a , atoms))
   |  ?mb :: ?tl => match lookup_atom (S n) a tl with
-                     (?v , ?atoms') => constr:(v, mb::atoms')
+                     (?v , ?atoms') => constr:((v, mb::atoms'))
                    end
-  |  nil => constr:(Var n a, [Var n a])
+  |  nil => constr:((Var n a, [Var n a]))
   end.
 
 Ltac reify_atom a atoms :=
@@ -193,13 +193,13 @@ Ltac reify_atom a atoms :=
 (* return: (reified_term, new_atoms) *)
 Ltac reify l atoms :=
     match l with
-      | nil => constr:(Id, atoms)
+      | nil => constr:((Id, atoms))
       | ?x :: ?xs =>
          match reify_atom [x] atoms with
           (?r, ?atoms') =>
             match reify xs atoms' with
               (?rs, ?atoms'') => 
-                constr:(Op r rs, atoms'')
+                constr:((Op r rs, atoms''))
             end
          end
       | ?l1 ++ ?l2 =>
@@ -207,7 +207,7 @@ Ltac reify l atoms :=
           (?r1, ?atoms') => 
           match reify l2 atoms' with
             (?r2, ?atoms'') =>
-              constr:(Op r1 r2, atoms'')
+              constr:((Op r1 r2, atoms''))
           end
         end
       | ?x => reify_atom x atoms
@@ -231,5 +231,3 @@ apply monoid_reflect;
 simpl;
 unfold PermutationAppendMonoid.R, PermutationAppendMonoid.op, PermutationAppendMonoid.i;
 try reflexivity.
-
-

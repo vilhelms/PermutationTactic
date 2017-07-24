@@ -8,3 +8,12 @@ Example permut_example: forall (a b c: list nat),
 Proof.
   intros a b c H. rewrite H. permutation.
 Qed.
+
+Export ListNotations.
+
+Example butterfly: forall b u t e r f l y : nat,
+ Permutation ([b;u;t;t;e;r]++[f;l;y]) ([f;l;u;t;t;e;r]++[b;y]).
+Proof.
+ intros.
+ permutation.
+Qed.
